@@ -3,7 +3,7 @@ const __dirname = getCurrentPath(import.meta.url);
 
 import got from '@/utils/got';
 import { load } from 'cheerio';
-const iconv = require('iconv-lite');
+import iconv from 'iconv-lite';
 import { art } from '@/utils/render';
 import * as path from 'node:path';
 
@@ -26,8 +26,9 @@ const parseDyArticle = (charset, item, tryGet) =>
             }
         });
 
+        const imgUrl = new URL(item.imgsrc);
         item.description = art(path.join(__dirname, 'templates/dy.art'), {
-            imgsrc: item.imgsrc?.split('?')[0],
+            imgsrc: imgUrl.searchParams.get('url'),
             postBody: $('.post_body').html(),
         });
 
@@ -38,6 +39,4 @@ const parseDyArticle = (charset, item, tryGet) =>
         return item;
     });
 
-module.exports = {
-    parseDyArticle,
-};
+export { parseDyArticle };

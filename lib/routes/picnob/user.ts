@@ -1,3 +1,4 @@
+import { Route } from '@/types';
 import { getCurrentPath } from '@/utils/helpers';
 const __dirname = getCurrentPath(import.meta.url);
 
@@ -7,10 +8,22 @@ import { load } from 'cheerio';
 import { parseDate } from '@/utils/parse-date';
 import { art } from '@/utils/render';
 import * as path from 'node:path';
-const { puppeteerGet } = require('./utils');
+import { puppeteerGet } from './utils';
 import puppeteer from '@/utils/puppeteer';
 
-export default async (ctx) => {
+export const route: Route = {
+    path: '/user/:id',
+    radar: [
+        {
+            source: ['picnob.com/profile/:id/*'],
+        },
+    ],
+    name: 'Unknown',
+    maintainers: ['TonyRL', 'micheal-death'],
+    handler,
+};
+
+async function handler(ctx) {
     const baseUrl = 'https://www.picnob.com';
     const id = ctx.req.param('id');
     const url = `${baseUrl}/profile/${id}/`;
@@ -93,11 +106,11 @@ export default async (ctx) => {
     );
     await browser.close();
 
-    ctx.set('data', {
+    return {
         title: `${profileName} (@${id}) - Picnob`,
         description: $('.info .sum').text(),
         link: url,
         image: $('.ava .pic img').attr('src'),
         item: list,
-    });
-};
+    };
+}
